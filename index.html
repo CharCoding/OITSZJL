@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>OITSZJL</title>
+	<style type="text/css">
+body {
+	position: absolute;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	align-items: center;
+	justify-content: center;
+	gap: 1vh;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #000;
+	margin: 0;
+	font-family: "Consolas", monospace;
+	font-size: 1.5vmin;
+}
+main {
+	display: grid;
+	background-color: #111;
+	grid-template: repeat(24, 1fr) / repeat(4, 2fr) 1fr repeat(10, 2fr) 1fr repeat(4, 2fr);
+	aspect-ratio: 19 / 24;
+	flex: 1 1 0;
+	max-width: 76vh;
+	margin-left: 1vh;
+}
+main span {
+	color: #eee;
+	text-align: center;
+}
+#hold_txt, #next_txt {
+	grid-column-end: span 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+#next_txt { grid-column-start: 18; }
+main svg {
+	padding: .2vmin;
+	width: 100%;
+	height: 100%;
+	box-sizing: border-box;
+}
+main label, main #preview, main textarea, main #highlight { display: none; }
+#editing_btn, #menu_btn {
+	display: flex;
+	color: #868686;
+	background-color: transparent;
+}
+#editing_btn svg { transition: transform 200ms; }
+#editing_btn:hover, #menu_btn:hover { color: rgba(255, 255, 255, 0.5); }
+#editing_btn:active, #menu_btn:active { color: #fff; }
+#editing_ckb:checked + label { color: #eee; }
+#editing_ckb:checked + label svg {
+	transform: rotate(45deg);
+}
+main button {
+	display: none;
+	align-items: center;
+	justify-content: center;
+	font-size: inherit;
+	appearance: none;
+	cursor: pointer;
+	border: .3vmin solid transparent;
+	padding: 0;
+	background-color: #868686;
+	aspect-ratio: 1;
+}
+main button:hover {
+	color: rgba(255, 255, 255, 0.5);
+	border-color: currentColor;
+}
+main button:active {
+	color: #fff;
+}
+#clear_btn:hover {
+	color: #f22;
+	border-color: currentColor;
+}
+#clear_btn:active {
+	color: #fff;
+	background-color: #f22;
+}
+main button:disabled {
+	cursor: not-allowed;
+	color: #666;
+	border-color: transparent;
+}
+.editing label, .editing button {
+	display: flex;
+}
+.editing #preview, .editing textarea, .editing #highlight {
+	display: block;
+}
+canvas {
+	image-rendering: pixelated;
+	image-rendering: optimizeSpeed;
+	background-color: #222;
+	width: 100%;
+	height: 100%;
+}
+#hold_cvs { grid-area: 2 / 1 / 4 / 5; }
+#matrix_cvs { grid-area: 1 / 6 / 24 / 16; }
+#queue_cvs { grid-area: 2 / 17 / 21 / 21; }
+.toggle {
+	color: #000;
+	text-align: center;
+	cursor: pointer;
+	justify-content: center;
+	align-items: center;
+	border: .3vmin solid transparent;
+	aspect-ratio: 1;
+}
+.toggle:hover {
+	color: rgba(255, 255, 255, 0.5);
+	border-color: currentColor;
+}
+
+main input:checked + .toggle {
+	color: #eee;
+	border-color: currentColor;
+	font-weight: bold;
+}
+#mirror_ckb:checked + .toggle svg {
+	transform: scale(-1, 1);
+}
+.o { background-color: #f6d03c; }
+.i { background-color: #42afe1; }
+.t { background-color: #9739a2; }
+.s { background-color: #51b84d; }
+.z { background-color: #eb4f65; }
+.j { background-color: #1165b5; }
+.l { background-color: #f38927; }
+.g { background-color: #868686; }
+.O { color: #f6d03c; }
+.I { color: #42afe1; }
+.T { color: #9739a2; }
+.S { color: #51b84d; }
+.Z { color: #eb4f65; }
+.J { color: #1165b5; }
+.L { color: #f38927; }
+.G { color: #868686; }
+main input[type*="o"] { display: none; }
+main input[type^="r"]:checked + label { cursor: default; }
+#undo_btn { grid-area: 21 / 1; }
+#redo_btn { grid-area: 21 / 2; }
+#mirror_btn { grid-area: 21 / 3; }
+#mirror_btn svg { transition: transform 200ms; }
+#clear_btn { grid-area: 21 / 4; }
+#a_btn { grid-area: 22 / 1; }
+.a {
+	background-image: linear-gradient(#eb4f65, #f38927, #f6d03c, #51b84d, #42afe1, #1165b5, #9739a2); /* if you use IE you only get this */
+	background-image: conic-gradient(#eb4f65, #f38927, #f6d03c, #51b84d, #42afe1, #1165b5, #9739a2, #eb4f65);
+	border-width: 0;
+}
+.a:hover {
+	border-width: .3vmin;
+}
+:checked + .a {
+	border-width: .3vmin;
+}
+#o_btn { grid-area: 22 / 2; }
+#i_btn { grid-area: 22 / 3; }
+#t_btn { grid-area: 22 / 4; }
+#s_btn { grid-area: 23 / 1; }
+#z_btn { grid-area: 23 / 2; }
+#j_btn { grid-area: 23 / 3; }
+#l_btn { grid-area: 23 / 4; }
+
+#g0 { grid-area: 24 / 6; }
+#g1 { grid-area: 24 / 7; }
+#g2 { grid-area: 24 / 8; }
+#g3 { grid-area: 24 / 9; }
+#g4 { grid-area: 24 / 10; }
+#g5 { grid-area: 24 / 11; }
+#g6 { grid-area: 24 / 12; }
+#g7 { grid-area: 24 / 13; }
+#g8 { grid-area: 24 / 14; }
+#g9 { grid-area: 24 / 15; }
+input[name*="g"] + label {
+	border-top: 0;
+	padding-top: .3vmin;
+}
+input[name*="g"]:checked + label {
+	background-color: #000;
+}
+#preview {
+	grid-area: 15 / 1 / 19 / 5;
+	background-color: #000;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+#previewPiece {
+	display: none;
+}
+#rotl_btn { grid-area: 15 / 1; }
+#rotr_btn { grid-area: 15 / 4; }
+#rot180_btn { grid-area: 18 / 4; }
+.rot_btn {
+	border: .3vmin solid #000;
+	padding: .1vmin;
+}
+.rot_btn:disabled {
+	border-color: #000;
+}
+.rot_btn:hover {
+	box-shadow: none;
+	border-color: rgba(255, 255, 255, 0.5);
+}
+.rot_btn:active {
+	border-color: currentColor;
+}
+#rot180_btn:active svg {
+	transition: transform 200ms;
+	transform: rotate(180deg);
+}
+#less_hint_btn {
+	grid-area: 19 / 1;
+	font-weight: bold;
+}
+#hint_btn {
+	grid-area: 19 / 2;
+}
+input:not(:checked) + #hint_btn svg:first-child {
+	display: none;
+}
+input:checked + #hint_btn svg:last-child {
+	display: none;
+}
+#more_hint_btn {
+	grid-area: 19 / 3;
+	font-weight: bold;
+}
+#screenshot_btn {
+	grid-area: 19 / 4;
+}
+#solid_btn {
+	grid-area: 20 / 1;
+}
+#ghost_btn {
+	grid-area: 20 / 2;
+}
+#piece_btn {
+	grid-area: 20 / 3;
+}
+#cell_btn {
+	grid-area: 20 / 4;
+}
+#garbage_meter, #progress_meter {
+	box-sizing: border-box;
+	padding: ;
+}
+#garbage_meter {
+	grid-area: 1 / 5 / 25 / 6;
+	background-color: #333;
+}
+#progress_meter {
+	grid-area: 1 / 16 / 25 / 17;
+	background-color: #333;
+}
+#rh { grid-area: 3 / 1; }
+#ho { grid-area: 3 / 2; }
+#hi { grid-area: 3 / 3; }
+#ht { grid-area: 3 / 4; }
+#hj { grid-area: 4 / 1; }
+#hl { grid-area: 4 / 2; }
+#hs { grid-area: 4 / 3; }
+#hz { grid-area: 4 / 4; }
+#eh { grid-area: 3 / 5; }
+#eq { grid-area: 22 / 17; }
+#rq { grid-area: 22 / 18; }
+
+#queue_txt, #highlight {
+	font-weight: bold;
+	word-break: break-all;
+	font-family: 'Consolas', monospace;
+	grid-area: 21 / 17 / 24 / 21;
+	overflow-y: auto;
+	box-sizing: border-box;
+	border: .3vmin solid #868686;
+	padding: .2vmin;
+}
+#queue_txt {
+	background-color: transparent;
+	color: transparent;
+	caret-color: #fff;
+	resize: none;
+	appearance: none;
+	margin: 0;
+	font-size: 1.5vmin;
+	border-radius: 0;
+}
+#queue_txt:hover {
+	border-color: rgba(255, 255, 255, 0.5);
+}
+#queue_txt:focus {
+	border-color: #fff;
+	outline: none;
+}
+#queue_txt::placeholder {
+	color: #777;
+}
+#highlight {
+	background-color: #111;
+}
+#bookmark_btn {
+	grid-area: 24 / 17;
+}
+#randomize_btn {
+	grid-area: 24 / 18;
+}
+#sequence_btn {
+	grid-area: 24 / 19;
+}
+#refill_btn {
+	grid-area: 24 / 20;
+}
+aside {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	justify-content: left;
+	background-color: #111;
+	aspect-ratio: 19 / 24;
+	flex: 1 1 0;
+	max-width: 76vh;
+	margin-right: 1vh;
+	color: #eee;
+}
+nav {
+	display: flex;
+	align-items: stretch;
+	left: 0;
+	width: 100%;
+	cursor: pointer;	
+	background-color: #333;
+	flex-grow: 0;
+}
+nav a {
+	text-align: center;
+	flex: 1 1 0;
+	padding: 2vh 0;
+}
+nav :link {
+	color: inherit;
+	text-decoration: none;
+}
+nav :visited {
+	color: inherit;
+}
+nav :hover {
+	color: inherit;
+	background-color: #444;
+}
+nav :active {
+	color: #fff;
+	background-color: #555;
+}
+nav :focus {
+	outline: none;
+}
+aside > div {
+	display: none;
+	background-color: #222;
+	box-sizing: border-box;
+	padding: 1vh;
+	overflow-y: auto;
+	flex-grow: 1;
+}
+aside > div:target {
+	display: block;
+}
+input, button, select {
+	font-size: 1.5vmin;
+}
+/*
+
+#stats {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 25vh;
+	height: 50%;
+}
+#dashboard {
+	position: absolute;
+	left: 100vh;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	background-color: #111;
+	display: flex;
+	flex-direction: column;
+}
+
+#panels {
+	position: relative;
+	flex-grow: 1;
+}
+#panels > div {
+	position: absolute;
+	display: none;
+	width: 100%;
+	height: 100%;
+	background-color: #222;
+	box-sizing: border-box;
+	padding: 1vh;
+	overflow-y: auto;
+}
+#panels > div:target {
+	display: block;
+}
+#modes {
+}
+#modes > div {
+	display: inline-block;
+	background-color: #000;
+	width: 18vh;
+	height: 24vh;
+	padding: 1vh;
+	margin: 1vh;
+	box-sizing: border-box;
+	cursor: pointer;
+	vertical-align: top;
+}
+#modes > div:hover, #settings > div:hover {
+	background-color: #111;
+	color: #fff;
+}
+#settings {
+}
+#settings > div {
+	background-color: #000;
+	padding: 1vh;
+	margin: 1vh;
+	box-sizing: border-box;
+}
+#guides {
+}
+h3 {
+	margin: 2px 0;
+}
+*/
+	</style>
+</head>
+<body>
+	<main id="main" class="editing">
+		<input type="checkbox" id="editing_ckb" autocomplete="on" checked>
+		<label id="editing_btn" for="editing_ckb" class="toggle">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+				<path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0"/>
+				<path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z"/>
+			</svg>
+		</label>
+		<span id="hold_txt">Hold</span>
+		<button id="edit_hold_btn">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+				<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+				<path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+			</svg>
+		</button>
+		<button id="edit_next_btn">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+				<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+				<path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+			</svg>
+		</button>
+		<span id="next_txt">Next</span>
+		<button id="menu_btn">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+				<path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/>
+			</svg>
+		</button>
+		<canvas id="hold_cvs" width="64" height="32"></canvas>
+		<canvas id="matrix_cvs" width="160" height="352"></canvas>
+		<canvas id="queue_cvs" width="64" height="304"></canvas>
+		<div id="garbage_meter"></div>
+		<div id="progress_meter"></div>
+		<div id="preview">
+			<div id="previewPiece"></div>
+		</div>
+		<button id="rotl_btn" class="rot_btn">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+				<path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"/>
+				<path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"/>
+			</svg>
+		</button>
+		<button id="rotr_btn" class="rot_btn">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+				<path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
+				<path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
+			</svg>
+		</button>
+		<button id="rot180_btn" class="rot_btn">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+				<path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41m-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9"/>
+				<path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z"/>
+			</svg>
+		</button>
+		<button id="less_hint_btn" disabled>&mdash;</button>
+		<input type="checkbox" id="hint_ckb" autocomplete="off">
+		<label id="hint_btn" class="toggle g" for="hint_ckb">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+  				<path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+  				<path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+			</svg>
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16">
+				<path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7 7 0 0 0-2.79.588l.77.771A6 6 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755q-.247.248-.517.486z"/>
+				<path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829"/>
+				<path d="M3.35 5.47q-.27.24-.518.487A13 13 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7 7 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12z"/>
+			</svg>
+		</label>
+		<button id="more_hint_btn" disabled>&#xff0b;</button>
+		<input type="radio" id="piece_rd" name="piece_cell" checked autocomplete="off">
+		<label for="piece_rd" class="toggle g" id="piece_btn">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pieces" viewBox="0 0 16 16">
+				<path d="M1 1h4v4h4v-2h4v-2h2v4h-2v10h2v-8h-10v6h-2v2h-2v-6h2v2h8v4h-4v-6h4v-8h-4v2h-4v4h-2Z" />
+			</svg>
+		</label>
+		<input type="radio" id="cell_rd" name="piece_cell" autocomplete="off">
+		<label for="cell_rd" class="toggle g" id="cell_btn">&#9632;</label>
+		<input type="radio" name="block_type" id="solid_rd" checked autocomplete="off">
+		<label id="solid_btn" class="toggle g" for="solid_rd">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-microsoft" viewBox="0 0 16 16">
+				<path d="M7.462 0H0v7.19h7.462zM16 0H8.538v7.19H16zM7.462 8.211H0V16h7.462zm8.538 0H8.538V16H16z"/>
+			</svg>
+		</label>
+		<input type="radio" name="block_type" id="ghost_rd">
+		<label id="ghost_btn" class="toggle g" for="ghost_rd">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-border" viewBox="0 0 16 16">
+				<path d="M0 0h.969v.5H1v.469H.969V1H.5V.969H0zm2.844 1h-.938V0h.938zm1.875 0H3.78V0h.938v1zm1.875 0h-.938V0h.938zm.937 0V.969H7.5V.5h.031V0h.938v.5H8.5v.469h-.031V1zm2.813 0h-.938V0h.938zm1.875 0h-.938V0h.938zm1.875 0h-.938V0h.938zM15.5 1h-.469V.969H15V.5h.031V0H16v.969h-.5zM1 1.906v.938H0v-.938zm6.5.938v-.938h1v.938zm7.5 0v-.938h1v.938zM1 3.78v.938H0V3.78zm6.5.938V3.78h1v.938zm7.5 0V3.78h1v.938zM1 5.656v.938H0v-.938zm6.5.938v-.938h1v.938zm7.5 0v-.938h1v.938zM.969 8.5H.5v-.031H0V7.53h.5V7.5h.469v.031H1v.938H.969zm1.875 0h-.938v-1h.938zm1.875 0H3.78v-1h.938v1zm1.875 0h-.938v-1h.938zm1.875-.031V8.5H7.53v-.031H7.5V7.53h.031V7.5h.938v.031H8.5v.938zm1.875.031h-.938v-1h.938zm1.875 0h-.938v-1h.938zm1.875 0h-.938v-1h.938zm1.406 0h-.469v-.031H15V7.53h.031V7.5h.469v.031h.5v.938h-.5zM0 10.344v-.938h1v.938zm7.5 0v-.938h1v.938zm8.5-.938v.938h-1v-.938zM0 12.22v-.938h1v.938zm7.5 0v-.938h1v.938zm8.5-.938v.938h-1v-.938zM0 14.094v-.938h1v.938zm7.5 0v-.938h1v.938zm8.5-.938v.938h-1v-.938zM.969 16H0v-.969h.5V15h.469v.031H1v.469H.969zm1.875 0h-.938v-1h.938zm1.875 0H3.78v-1h.938v1zm1.875 0h-.938v-1h.938zm.937 0v-.5H7.5v-.469h.031V15h.938v.031H8.5v.469h-.031v.5zm2.813 0h-.938v-1h.938zm1.875 0h-.938v-1h.938zm1.875 0h-.938v-1h.938zm.937 0v-.5H15v-.469h.031V15h.469v.031h.5V16z"/>
+			</svg>
+		</label>
+		<button id="undo_btn" aria-label="undo" disabled><!--↶-->
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
+				<path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
+			</svg>
+		</button>
+		<button id="redo_btn" aria-label="redo" disabled><!--↷-->
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
+				<path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
+			</svg>
+		</button>
+		<input type="checkbox" id="mirror_ckb" aria-label="mirror">
+		<label for="mirror_ckb" class="toggle g" id="mirror_btn">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-right" viewBox="0 0 16 16">
+				<path fill-rule="evenodd" d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5"/>
+			</svg>
+		</label>
+		<button id="screenshot_btn">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-camera" viewBox="0 0 16 16">
+				<path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4z"/>
+				<path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5m0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>
+			</svg>
+		</button>
+		<button id="clear_btn">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+				<path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+			</svg>
+		</button>
+		<input type="radio" name="place_piece" id="a_rd" checked><label class="toggle g a" for="a_rd" id="a_btn">A</label>
+		<input type="radio" name="place_piece" id="o_rd"><label class="toggle o" for="o_rd" id="o_btn">O</label>
+		<input type="radio" name="place_piece" id="i_rd"><label class="toggle i" for="i_rd" id="i_btn">I</label>
+		<input type="radio" name="place_piece" id="t_rd"><label class="toggle t" for="t_rd" id="t_btn">T</label>
+		<input type="radio" name="place_piece" id="s_rd"><label class="toggle s" for="s_rd" id="s_btn">S</label>
+		<input type="radio" name="place_piece" id="z_rd"><label class="toggle z" for="z_rd" id="z_btn">Z</label>
+		<input type="radio" name="place_piece" id="j_rd"><label class="toggle j" for="j_rd" id="j_btn">J</label>
+		<input type="radio" name="place_piece" id="l_rd"><label class="toggle l" for="l_rd" id="l_btn">L</label>
+		<input type="checkbox" name="garbage_col" id="g_rd0"><label class="toggle g" for="g_rd0" id="g0">&#9650;</label>
+		<input type="checkbox" name="garbage_col" id="g_rd1"><label class="toggle g" for="g_rd1" id="g1">&#9650;</label>
+		<input type="checkbox" name="garbage_col" id="g_rd2"><label class="toggle g" for="g_rd2" id="g2">&#9650;</label>
+		<input type="checkbox" name="garbage_col" id="g_rd3"><label class="toggle g" for="g_rd3" id="g3">&#9650;</label>
+		<input type="checkbox" name="garbage_col" id="g_rd4"><label class="toggle g" for="g_rd4" id="g4">&#9650;</label>
+		<input type="checkbox" name="garbage_col" id="g_rd5"><label class="toggle g" for="g_rd5" id="g5">&#9650;</label>
+		<input type="checkbox" name="garbage_col" id="g_rd6"><label class="toggle g" for="g_rd6" id="g6">&#9650;</label>
+		<input type="checkbox" name="garbage_col" id="g_rd7"><label class="toggle g" for="g_rd7" id="g7">&#9650;</label>
+		<input type="checkbox" name="garbage_col" id="g_rd8"><label class="toggle g" for="g_rd8" id="g8">&#9650;</label>
+		<input type="checkbox" name="garbage_col" id="g_rd9"><label class="toggle g" for="g_rd9" id="g9">&#9650;</label>
+		<div id="highlight"></div>
+		<textarea id="queue_txt" spellcheck="false" placeholder="OITSZJLR*">OITSZJL</textarea>
+		<button id="bookmark_btn">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bookmark-plus" viewBox="0 0 16 16">
+				<path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z"/>
+				<path d="M8 4a.5.5 0 0 1 .5.5V6H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V7H6a.5.5 0 0 1 0-1h1.5V4.5A.5.5 0 0 1 8 4"/>
+			</svg>
+		</button>
+		<button id="randomize_btn">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-dice-3" viewBox="0 0 16 16">
+				<path d="M13 1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2zM3 0a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V3a3 3 0 0 0-3-3z"/>
+				<path d="M5.5 4a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m8 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m-4-4a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+			</svg>
+		</button>
+		<button id="sequence_btn">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-regex" viewBox="0 0 16 16">
+				<path fill-rule="evenodd" d="M3.05 3.05a7 7 0 0 0 0 9.9.5.5 0 0 1-.707.707 8 8 0 0 1 0-11.314.5.5 0 1 1 .707.707m9.9-.707a.5.5 0 0 1 .707 0 8 8 0 0 1 0 11.314.5.5 0 0 1-.707-.707 7 7 0 0 0 0-9.9.5.5 0 0 1 0-.707M6 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0m5-6.5a.5.5 0 0 0-1 0v2.117L8.257 5.57a.5.5 0 0 0-.514.858L9.528 7.5 7.743 8.571a.5.5 0 1 0 .514.858L10 8.383V10.5a.5.5 0 1 0 1 0V8.383l1.743 1.046a.5.5 0 0 0 .514-.858L11.472 7.5l1.785-1.071a.5.5 0 1 0-.514-.858L11 6.617z"/>
+			</svg>
+		</button>
+		<input type="checkbox" id="refill_ckb" checked>
+		<label class="toggle g" id="refill_btn" for="refill_ckb">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-infinity" viewBox="0 0 16 16">
+				<path d="M5.68 5.792 7.345 7.75 5.681 9.708a2.75 2.75 0 1 1 0-3.916ZM8 6.978 6.416 5.113l-.014-.015a3.75 3.75 0 1 0 0 5.304l.014-.015L8 8.522l1.584 1.865.014.015a3.75 3.75 0 1 0 0-5.304l-.014.015zm.656.772 1.663-1.958a2.75 2.75 0 1 1 0 3.916z"/>
+			</svg>
+		</label>
+		<div id="stats"></div>
+	</main>
+	<aside>
+		<nav>
+			<a href="#modes_tab">Game Modes</a>
+			<a href="#settings_tab">Set&shy;tings</a>
+			<a href="#database_tab">Data&shy;base</a>
+			<a href="#about_tab">A&shy;bout</a>
+		</nav>
+		<div class="panel" id="modes_tab">modes</div>
+		<div class="panel" id="settings_tab">
+			<div>
+				<h3>Handling</h3>
+				DAS:&nbsp;<input type="number" id="das_ms" min="4" max="999" step="1" value="110" placeholder="500" size="4">ms &nbsp;
+				ARR:&nbsp;<input type="number" id="arr_ms" min="0" max="400" step="1" value="4" placeholder="100" size="4">ms &nbsp;
+				SDF:&nbsp;<input type="number" id="sdf" min="1" max="41" step="1" value="40" placeholder="40" size="4">x
+			</div>
+			<div>
+				<h3>Controls</h3>
+				<button id="left_btn">Left: <b>Q</b></button> &nbsp;
+				<button id="right_btn">Right: <b>E</b></button> &nbsp;
+				<button id="softdrop_btn">Soft Drop: <b>W</b></button> &nbsp;
+				<button id="harddrop_btn">Hard Drop: <b>Space</b></button> &nbsp;
+				<button id="rotateccw_btn">Rotate CCW: <b>I</b></button> &nbsp;
+				<button id="rotatecw_btn">Rotate CW: <b>O</b></button> &nbsp;
+				<button id="rotate180_btn">Rotate 180: <b>P</b></button> &nbsp;
+				<button id="hold_btn">Hold: <b>[</b></button> &nbsp;
+				<button id="pause_btn">Pause: <b>U</b></button> &nbsp;
+				<button id="restart_btn">Restart: <b>Esc</b></button> &nbsp;
+				<button id="mirror_btn">Mirror: <b>M</b></button> &nbsp;
+				<button id="queue_btn">Edit Queue: <b>T</b></button> &nbsp;
+				<button id="undo_btn">Undo: <b>Z</b></button> &nbsp;
+				<button id="redo_btn">Redo: <b>Y</b></button> &nbsp;
+				<button id="hint_btn">Reveal next hint: <b>H</b></button> &nbsp;
+				<button id="unhint_btn">Hide current hint: <b>G</b></button>
+			</div>
+			<div>
+				<h3>RNG & Queue</h3>
+				Engine:&nbsp;<select id="rng_engine">
+					<option value="0" selected>7-bag</option>
+					<option value="1">14-bag</option>
+					<option value="2">NES*</option>
+					<option value="3">Uniform</option>
+				</select> &nbsp;
+				Seed:&nbsp;<input type="number" id="seed_num" min="0" max="4294967295" step="1" placeholder="randomize" size="10"><br>
+				Queue:&nbsp;<input type="text" id="queue_regex" value="" placeholder="See About section for details" size="32">
+				<input type="button" id="regenerate_queue_btn" value="Regenerate">
+				<input type="button" id="clear_queue" value="Clear">
+			</div>
+			<div>
+				<h3>Appearance</h3>
+				Zoom:&nbsp;<input type="number" id="zoom" value="100" min="50" max="150" size="3">% &nbsp;
+				Grid:&nbsp;<select id="grid">
+					<option value="0">None</option>
+					<option value="1">Vertical lines</option>
+					<option value="2">Horizontal lines</option>
+					<option value="3" selected>Grid lines</option>
+					<option value="4">Vertical Stripes</option>
+					<option value="5">Horizontal Stripes</option>
+					<option value="6">Checkerboard</option>
+				</select> &nbsp;
+				Shadow:&nbsp;<select id="shadow">
+					<option value="0">None</option>
+					<option value="1">Gray</option>
+					<option value="2" selected>Colored</option>
+				</select><br>
+				<input type="checkbox" id="bag_separator" checked> <label for="bag_separator">Draw bag separator</label>
+				<input type="checkbox" id="rotation_center" checked> <label for="rotation_center">Draw piece rotation center</label>
+			</div>
+			<div>
+				<h3>Gameplay</h3>
+				Gravity:&nbsp;<input type="number" id="gravity" value="1" min="0" max="20" placeholder="1" size="2"> &nbsp;
+				Next Pieces:&nbsp;<input type="number" id="next_pieces" value="5" min="0" max="12" placeholder="5" size="2">
+				<input type="checkbox" id="enable_hold" checked> <label for="enable_hold">Enable hold</label><br>
+				Kicks:&nbsp;<select id="kicks">
+					<option value="0">None</option>
+					<option value="1">SRS</option>
+					<option value="2" selected>SRS+</option>
+					<option value="3">SRS-X</option>
+				</select> &nbsp;
+				180&nbsp;Kicks:&nbsp;<select id="kicks180">
+					<option value="-1">Disabled</option>
+					<option value="0">None</option>
+					<option value="1">Jstris</option>
+					<option value="2" selected>TETR.IO</option>
+				</select><br>
+				<input type="checkbox" id="redo_finesse"> <label for="redo_finesse">Undo on Finesse Fault</label>
+			</div>
+		</div>
+		<div class="panel" id="database_tab">database</div>
+		<div class="panel" id="about_tab">OITSZJL</div>
+	</aside>
+	<!--div id="game">
+		<div id="stats" style="display: none;">Combo&times;2 B2B&times;10 Quad PC + 16<br>
+0 Pieces | 0.0 PPS<br>
+0 Lines | 0.0 LPM<br>
+0 Attack | 0.0 APM<br>
+0 Inputs | 0.0 KPS<br>
+0.0 KPP | 0.0 APP<br>
+0 Score | 0.0 SPP<br>
+0:00 | 2:00<br>
+		</div-->
+<!--
+Tabulate stats?
+		Pieces	Time 	PPS?	Time remaining?
+Attack	APP		APM
+Lines			LPM
+Inputs	KPP		KPM
+Score	SPP
+VS?
+Finesse %? Finesse faults?
+---
+P PPS
+A APM
+APP VS 
+K H KPP KPS
+T%? I%?
+---
+General: Pieces, Lines, Time, Score, Attack
+Speed: PPS LPM KPS
+Finesse: input, KPP, Hold, Finesse%, Faults
+Attack: ATK, APM, APP, T%?, PC?
+Garbage: Sent, Tanked, Cleared, VS?
+	</div-->
+	<!--div id="dashboard">
+		<nav>
+			<a href="#modes">Game Modes</a>
+			<a href="#settings">Set&shy;tings</a>
+			<a href="#editor">Edi&shy;tor</a>
+			<a href="#guides">Guides</a>
+			<a href="#about">A&shy;bout</a>
+		</nav>
+		<div id="panels">
+			<div id="modes" style="display: block;">
+				<div id="practice_mode">
+					<h3>Casual</h3>
+					Just play. Undo and redo are enabled.
+				</div>
+				<div id="sprint_mode">
+					<h3>Sprint</h3>
+					<select id="sprint_lines">
+						<option value="20">20 lines</option>
+						<option value="40" selected>40 lines</option>
+						<option value="100">100 lines</option>
+						<option value="1000">1000 lines</option>
+					</select><br>
+					Clear lines as fast as possible.
+				</div>
+				<div id="blitz_mode">
+					<h3>Blitz</h3>
+					<select id="blitz_time">
+						<option value="60000">1 minute</option>
+						<option value="120000" selected>2 minutes</option>
+						<option value="180000">3 minutes</option>
+					</select><br>
+					Obtain the highest score within a limited time.
+				</div>
+				<div id="pc_mode">
+					<h3>PC</h3>
+					Make consecutive perfect clears.
+				</div>
+				<div id="learn_mode">
+					<h3>Learn</h3>
+					Pick some guides and loop through all possible paths.
+				</div>
+				<div id="create_mode">
+					<h3>Create</h3>
+					Create and publish guides and studies.
+				</div>
+				<div id="cheese_mode">
+					<h3>Cheese race</h3>
+					<select id="cheese_lines">
+						<option value="10">10 lines</option>
+						<option value="18">18 lines</option>
+						<option value="100" selected>100 lines</option>
+					</select><br>
+					<input type="checkbox" id="cheese_multiwell"> <label for="cheese_multiwell">Multiple wells</label><br>
+					Downstack as fast as possible through cheese.
+				</div>
+				<div id="survival">
+					<h3>Survival</h3>
+					Garbage APM: <input type="number" id="survival_garbage_apm" min="30" max="120" value="60" step="5" size="4" placeholder="APM"><br>
+					Attack pattern: <select id="survival_attack_pattern">
+						<option value="0">Single line</option>
+						<option value="1">Backfire</option>
+						<option value="2">Inverse backfire</option>
+						<option value="3">SDPC+DPC Loop</option>
+						<option value="4">MT2+DPC Loop</option>
+						<option value="5">Stickspin Loop</option>
+						<option value="6">2PC+DPC Loop</option>
+					</select><br>
+					Survive and stay low as garbage piles up.
+				</div>
+				<div id="fourwide_mode">
+					<h3>Four-wide</h3>
+					<input type="checkbox" id="fourwide_residue"> <label for="fourwide_residue">Enable residue</label><br>
+					Make the board four blocks wide.
+				</div>
+			</div>
+			<div id="settings">
+				
+			</div>
+			<div id="editor">
+				<div id="spawn_o"></div>
+				<div id="spawn_i"></div>
+				<div id="spawn_t"></div>
+				<div id="spawn_j"></div>
+				<div id="spawn_l"></div>
+				<div id="spawn_s"></div>
+				<div id="spawn_z"></div>
+				<div id="spawn_g"></div>
+			</div>
+			<div id="guides">
+				<datalist id="guide_names">
+					<option value="Albatross"></option>
+					<option value="Drunk Albatross"></option>
+					<option value="BT Cannon"></option>
+					<option value="C spin"></option>
+					<option value="DT Cannon"></option>
+					<option value="SDPC"></option>
+					<option value="Stickspin"></option>
+					<option value="SDPC spin"></option>
+					<option value="MS2"></option>
+					<option value="TKI"></option>
+					<option value="Ajanba TSD"></option>
+					<option value="Reliable"></option>
+					<option value="DPC"></option>
+					<option value="1st"></option>
+					<option value="2nd"></option>
+					<option value="3rd"></option>
+					<option value="4th"></option>
+					<option value="5th"></option>
+					<option value="6th"></option>
+					<option value="7th"></option>
+					<option value="8th"></option>
+					<option value="PCO"></option>
+					<option value="Pelican"></option>
+					<option value="Hachispin"></option>
+					<option value="Gamushiro"></option>
+					<option value="Sailboat"></option>
+					<option value="Mech TSD"></option>
+				</datalist>
+				<input type="search" list="guide_names" id="search_guides" placeholder="SDPC" maxlength="16" size="16"> &nbsp;
+				<label for="match_board"><input type="checkbox" id="match_board" checked> Match current board</label> &nbsp;
+				<label for="match_queue"><input type="checkbox" id="match_queue" checked> Match current queue</label> &nbsp;
+				<select id="search_filter">
+					<option value="0">Alphabetical order</option>
+					<option value="1">Max attack</option>
+					<option value="2">Max build chance</option>
+				</select>
+			</div>
+			<div id="about">
+				<p>OITJLSZ is a block stacker game that attempts to unite a few needs for players - practice, learn, share openers, perfect clear strategies, replay review, etc. This specific order of pieces allow a tiny optimization in the mirroring of pieces, hence the name "OITJLSZ". You can view the source code on <a href="https://github.com/CharCoding/">GitHub</a> if you're a nerd like me.<br>
+				Making this is mostly because I wanted to explore GUI design. Modern T****s<sup>&reg;</sup> is such a complicated game despite how simple its premise, so it's not easy to make all the settings and details intuitive. And, let's be honest, Fumen is kind of crappy and outdated.</p>
+		</div>
+		</div>
+	</div-->
+	<script type="text/javascript">'use strict';
+const dict = new String('EOITSZJLGoitszjl'),
+	t = matrix_cvs.getContext('2d', { alpha: false }),
+	colors = ['#000000', '#f6d03c', '#42afe1', '#9739a2', '#51b84d', '#eb4f65', '#1165b5', '#f38927', '#868686'],
+	accents = ['#101010', '#f9df6c', '#5cc7f9', '#b94bc6', '#70d36d', '#f96c67', '#2c84da', '#f99e4c', '#bdbdbd'],
+	borders = ['#1f1f1f', '#ffff7f', '#6ceaff', '#d958e9', '#84f880', '#ff7f79', '#339bff', '#ffba59', '#dddddd'],
+	shadows = ['#2c2e34', '#81733e', '#3b667e', '#5c3866', '#406945', '#7c414e', '#28496d', '#7f5736', '#72747a'],
+	pieces = [
+		null,
+		Int8Array.of(1, 0, 0, 1, 0, 0, 1,32, 1, 0, 0, 0, 1, 1, 0,16, 1, 0, 0, 1, 0, 0, 1,32, 1, 0, 0, 0, 1, 1, 0),
+		Int8Array.of(1, 2, 1, 0, 1,-1, 1,16, 1, 1,-1, 1, 2, 1, 0,16, 0,-1, 0, 2, 0, 1, 0,48, 0, 0, 2, 0, 1, 0,-1),
+		Int8Array.of(0, 0, 1, 1, 0,-1, 0,16, 0, 1, 0, 0, 1, 0,-1,16, 0, 0,-1, 1, 0,-1, 0,48, 0,-1, 0, 0, 1, 0,-1),
+		Int8Array.of(0, 0, 1, 1, 1,-1, 0,32, 0, 1,-1, 0, 1, 1, 0,16, 0,-1,-1, 0,-1, 1, 0,32, 0,-1, 0,-1, 1, 0,-1),
+		Int8Array.of(0,-1, 1, 0, 1, 1, 0,32, 0, 1, 0, 1, 1, 0,-1,16, 0, 0,-1, 1,-1,-1, 0,32, 0,-1,-1, 0, 1,-1, 0),
+		Int8Array.of(0,-1, 1, 1, 0,-1, 0,16, 0, 1, 1, 0, 1, 0,-1,16, 0, 1,-1, 1, 0,-1, 0,48, 0,-1,-1, 0, 1, 0,-1),
+		Int8Array.of(0, 1, 1, 1, 0,-1, 0,16, 0, 1,-1, 0, 1, 0,-1,16, 0,-1,-1, 1, 0,-1, 0,48, 0,-1, 1, 0, 1, 0,-1)
+	], kicks = [
+	], iokicks = [
+	], stats = {
+
+	}, history = [
+		// [board, queue, hold]
+	],
+	keysdown = {},
+	mirror = p => p ^ (p >> 2 & 1),
+	rotate = x => pieceRot = pieceRot + x & 24, // 0 8 16 24
+	spawnLoc = p => p > 2, // should not need this? if pieces are encoded right
+	checkerParity = b => {
+
+	},
+	columnarParity = b => {
+
+	},
+	mirrorBoard = b => b.forEach(row => {
+		for(let i = 4; i >= 0; --i) {
+			const temp = mirror(row[i]);
+			row[i] = mirror(row[9 - i]);
+			row[9 - i] = temp;
+		}
+		// swap queue?
+		// mirror current piece location?
+	}),
+	clearBoard = b => b.forEach(row => row.fill(0)),
+	clearLines = b => {
+		let delta = 0;
+		for(let i = 0; i < b.length; ++i) {
+		  	if(arr[i].every(x => x)) {
+		    	++delta;
+		      	continue;
+		    }
+		   	arr[i - delta] = arr[i];
+		}
+		delta = b.length - delta;
+		while(delta < b.length)
+		  	arr[delta++] = new Int8Array(10);
+	},
+	addGarbage = (b, height, col) => { // 39 >= height >= 1
+		let i = 39;
+		do {
+			b[i] = b[i - height];
+		} while(--i >= height)
+		do {
+			b[i] = new Int8Array(10).fill(8);
+			b[i][col] = 0;
+		} while(--i >= 0)
+	},
+	addSwiss = (b, height, rng) => {
+		let i = 39;
+		do {
+			b[i] = b[i - height];
+		} while(--i >= height)
+		do {
+			const swiss = new Int8Array(10);
+			let mask = rng();
+			for(let j = 10; j--; mask >>= 1)
+				swiss[j] = mask & 8;
+			b[i] = swiss;
+		} while(--i >= 0)
+	},
+	rng = seed => () => seed = seed * 1664525 + 1013904223 >>> 0,
+	draw = now => {
+		t.clearRect(0, 0, matrix.width, matrix.height);
+
+		for(let y = 22; y--;) {
+			const row = board[y];
+			for(let x = 10; x--;) {
+				const cell = row[x];
+				if(cell) {
+					t.fillStyle = colors[cell];
+					t.fillRect(x * side, y * side, side, side);
+				}
+			}
+		}
+		//timer = requestAnimationFrame(draw);
+	}, registerInput = (input, verify, callback) => {
+		let value = input.value;
+		if(input.tagName == 'input') {
+			if(input.type == 'number') {
+				value = +input.value;
+			} else if(input.type == 'checkbox') {
+				value = input.checked;
+			}
+		}
+		if(!verify || verify(value)) {
+			callback(value, input.id);
+		}
+	}, saveSettings = () => {
+		localStorage.setItem('config', JSON.stringify(config));
+		localStorage.setItem('keybinds', JSON.stringify(keybinds));
+	}, loadSettings = () => {
+		config = JSON.parse(localStorage.getItem('config'));
+		keybinds = JSON.parse(localStorage.getItem('keybinds'));
+	}, exportSettings = () => {
+		prompt('Copy the JSON config:', JSON.stringify({config,keybinds}));
+	}, importSettings = () => {
+		try {
+			const obj = JSON.parse(prompt('Enter the JSON config:', '{}'));
+			if(obj.config)
+				for(const keys of Object.keys(config))
+					if(obj.config[keys])
+						config[keys] = obj.config[keys];
+			if(obj.keybinds)
+				for(const keys of Object.keys(keybinds))
+					if(obj.keybinds[keys])
+						keybinds[keys] = obj.keybinds[keys];
+		} catch(e) {
+			console.log(e);
+		}
+	};
+{
+	const defaultSetting = (value, id) => {
+		settings[id] = value;
+		saveSettings();
+	},
+	defaultKeybind = (value, id) => {
+
+	}
+}
+
+const settings = {
+	createSetting: (name, default_value, callback) => {
+
+	},
+	revertSetting: () => {
+
+	}
+}
+
+class Game {
+	
+}
+let board = new Array(40),
+	side = 16,
+	currentPiece = 0,
+	heldPiece = 0,
+	pieceX = 4,
+	pieceY = 22,
+	pieceRot = 0, // 8 16 24
+	config = {
+
+	}, keybinds = {
+		left: 'Q',
+		right: 'E',
+		softdrop: 'W',
+		harddrop: 'space',
+	},
+	changingKeybind = '',
+	timer = 0,
+	histIndex = 0;
+	//matrix.width = matrix.height = window.innerHeight;
+for(let i = 40; i--;) board[i] = new Int8Array(10);
+for(let i = 16; i--;) dict[dict[i]] = i;
+
+t.scale(1, -1);
+t.translate(side * -3, side - matrix_cvs.height);
+
+/*
+generateSettings({
+	mode: {
+		type: 'select',
+		options: { // how should game modes be defined?
+			Practice: 0, // 7*
+			Learn: 1, // custom depending on loaded setup?
+			Create: 2, // custom
+			PC: {
+				All: 3, // 7*
+				'1st': 4, // 7*4*
+				'2nd': 5, // 4*7*
+				'3rd': 6, // 1*7*3*
+				'4th': 7, // 5*5*
+				'5th': 8, // 2*7*2*
+				'6th': 9, // 6*5*
+				'7th': 10, // 3*7*1*
+				'8th': 11, // ??? this is not possible to specify with regex *->*
+				dpc: 12 // 1*7*7*
+			},
+			'4W': {
+				'No residual': 13, // 7*
+				'With residual': 14 // 7*
+			},
+			'Cheese Race': 15 // 7*
+		},
+		callback: function(val) {
+			// check if game running, ask if abandon
+			// set to new game mode
+		}
+	}
+});
+*/
+// standard setting onchange callback:
+function onbeforeinput(evt) { // wtf not an actual spec
+	let oldVal = this.value;
+
+}
+
+/*
+DAS/ARR/SDF system, tick vs render
+eg. das = 100ms, arr = 4ms, fps = 60 -> mspf = 16.67
+|-100-|-4-|-4-|-4-|-3-|
+M     M   M   M   M   /
+FFFFFF| ----- F --------|
+*/
+
+/*
+Board compression (normal modes? ideally don't compress create mode)
+no garbage vs well garbage vs rand garbage?
+
+all nonzero state special encoding? 7^10 for no garbage
+basic encoding: well garbage + no extra blocks + no filled row: sign: unused; 31: garbage row indication -> n-th bit set = has garbage
++- | 1 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 | 3 |
+    gbg|                          |     10     |
+advanced encoding: fuck it just store the whole board
+should board store height map?
+*/
+function encodeBoard(board) {
+	let arr = [];
+	for(const row of board) {
+		
+	}
+}
+/*
+document.addEventListener('keydown', e => {
+	console.log(e.key, e.which, e.keyCode);
+}, true);
+document.addEventListener('keyup', e => {
+	console.log(e.key, e.which, e.keyCode);
+}, true);*/
+
+function syncScroll() {
+  highlight.scrollTop = queue_txt.scrollTop;
+}
+function syncText(txt) {
+	while(highlight.children.length > txt.length)
+		highlight.removeChild(highlight.lastChild);
+	for(var i = 0; i < highlight.textContent.length; ++i) {
+		if(highlight.textContent[i] != txt[i]) {
+			const span = highlight.children[i];
+			span.className = span.textContent = txt[i];
+		}
+	}
+	for(; i < txt.length; ++i) {
+		const span = document.createElement('span');
+		span.className = span.textContent = txt[i];
+		highlight.appendChild(span);
+	}
+}
+queue_txt.addEventListener('scroll', syncScroll);
+queue_txt.addEventListener('keydown', function(e) {
+	if(e.key == 'Enter') {
+		e.preventDefault();
+		queue_txt.blur();
+		return false;
+	}
+	syncScroll();
+});
+queue_txt.addEventListener('input', function(e) {
+	let send = queue_txt.selectionEnd;
+	queue_txt.value = queue_txt.value.toUpperCase()
+		.replace(/R/g, () => 'OITSZJL'[Math.random() * 7 | 0])
+		.replace(/[^OITJLSZ*]/g, '')
+		.replace(/\*/g, () => {
+		let i = 7;
+		const result = ['O', 'I', 'T', 'S', 'Z', 'J', 'L'];
+		while(i > 1) {
+			const j = Math.random() * i-- | 0,
+				temp = result[j];
+			result[j] = result[i];
+			result[i] = temp;
+		}
+		send += 6;
+		return result.join('');
+	});
+	syncText(queue_txt.value);
+	queue_txt.selectionStart = queue_txt.selectionEnd = send;
+});
+for(let i = 0, str = queue_txt.value; i < str.length; ++i) {
+	const span = document.createElement('span');
+	span.className = span.textContent = str[i];
+	highlight.appendChild(span);
+}
+window.addEventListener('resize', function(e) {
+	// possibly a lot more updates
+	syncScroll();
+});
+// oh god all the buttons and labels and inputs and toggles
+editing_ckb.addEventListener('change', function(e) {
+	main.className = this.checked ? 'editing' : '';
+});
+main.className = editing_ckb.checked ? 'editing' : '';
+hint_ckb.addEventListener('change', function(e) {
+	less_hint_btn.disabled = more_hint_btn.disabled = !this.checked;
+});
+piece_rd.addEventListener('change', function(e) {
+	a_btn.textContent = 'A';
+	a_btn.className = 'toggle g a';
+	rotl_btn.disabled = rotr_btn.disabled = rot180_btn.disabled = false;
+});
+cell_rd.addEventListener('change', function(e) {
+	a_btn.textContent = 'G';
+	a_btn.className = 'toggle g';
+	rotl_btn.disabled = rotr_btn.disabled = rot180_btn.disabled = true;
+});
+let garbageCol = -1; // TODO: possibly reintegrate into game.settings? game.editor?
+for(const ckb of document.getElementsByName('garbage_col')) {
+	ckb.checked = false;
+	ckb.addEventListener('change', function(e) {
+		// return if multi-well garbage enabled
+		if(this.checked) {
+			if(garbageCol >= 0) {
+				document.getElementById('g_rd' + garbageCol).checked = false;
+			}
+			garbageCol = +this.id[4];
+		} else {
+			garbageCol = -1;
+		}
+	});
+}
+	</script>
+</body>
+</html>
